@@ -1,23 +1,25 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import * as mysql from 'mysql';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { LoggingMiddleware } from '@/middleware/logging.middleware';
 import type { MiddlewareConsumer } from '@nestjs/common';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: `${process.env.MYSQL_USERNAME}`,
-      password: `${process.env.MYSQL_PASSWORD}`,
-      database: `${process.env.MYSQL_DATABASE}`,
-      entities: [`${__dirname}/**/*.entity{.ts,.js}`],
-      synchronize: true,
-      driver: mysql,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
+        type: 'mysql',
+        host: '127.0.0.1',
+        port: 3306,
+        username: configService.get<string>('MYSQL_USERNAME'),
+        password: configService.get<string>('MYSQL_PASSWORD'),
+        database: configService.get<string>('MYSQL_DATABASE'),
+        entities: [`${__dirname}/**/*.entity{.ts,.js}`],
+        synchronize: true,
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [],
