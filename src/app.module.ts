@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { LoggingMiddleware } from '@/middleware/logging.middleware';
 import type { MiddlewareConsumer } from '@nestjs/common';
+import { AuthModule } from '@/auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import type { MiddlewareConsumer } from '@nestjs/common';
       }),
       inject: [ConfigService],
     }),
+    AuthModule,
   ],
   controllers: [],
   providers: [],
